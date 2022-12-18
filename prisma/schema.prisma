@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userID   Int     @id @default(autoincrement()) // Код клиента
+  name     String // Имя
+  surname  String? // Фамилия
+  role     Role    @relation(fields: [roleID], references: [roleID]) // Связь
+  roleID   Int // Должность
+  login    String // Логин
+  password String // Пароль
+  email  String? // Почта
+  number   String? // Телефон
+  cart     Cart[]
+  sale     Sale[]
+}
+
+model Track {
+  trackID   Int     @id @default(autoincrement()) // Код записи
+  title     String // Название
+  genre     Genre   @relation(fields: [genreID], references: [genreID]) // Связь
+  genreID   Int     @default(1) // Код жанра
+  autor     Autor   @relation(fields: [autorID], references: [autorID]) // Связь
+  autorID   Int     @default(1) // Код автора
+  album     Album   @relation(fields: [albumID], references: [albumID]) // Связь
+  albumID   Int     @default(1) // Код альбома
+  image     String? // Путь до картинки трека
+  price     Int // Цена
+  music     String? // Путь до музыки
+  cart      Cart[]
+  sale      Sale[]
+}
+
+model Role {
+  roleID Int    @id @default(autoincrement()) // Код роли
+  title  String // Название
+  user   User[] // Массив пользователей
+}
+
+model Cart {
+  cartID  Int   @id @default(autoincrement()) // Код корзины
+  user    User  @relation(fields: [userID], references: [userID]) // Связь
+  userID  Int   @default(1) // Код пользователя
+  track   Track @relation(fields: [trackID], references: [trackID]) // Связь
+  trackID Int   @default(1) // Код корзины
+}
+
+model Sale {
+  saleID  Int   @id @default(autoincrement()) // Код продажи
+  date DateTime // Дата покупки
+  user    User  @relation(fields: [userID], references: [userID]) // Связь
+  userID  Int   @default(1) // Код пользователя
+  track   Track @relation(fields: [trackID], references: [trackID]) // Связь
+  trackID Int   @default(1) // Код корзины
+}
+
+model Genre {
+  genreID Int     @id @default(autoincrement()) // Код жанра
+  title   String // Название
+  trackID Track[] // Код записи
+}
+
+model Autor {
+  autorID  Int     @id @default(autoincrement()) // Код автора
+  title String // Псевдоним | Название
+  trackID  Track[] // Код записи
+}
+
+model Album {
+  albumID    Int      @id @default(autoincrement()) // Код альбома
+  title      String // Название альбома
+  trackID    Track[] // Код записи
+}
